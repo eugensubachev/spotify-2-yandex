@@ -45,13 +45,13 @@ nano .env
 
 2. Получить Spotify API ключи
 
-Нужно перейти в Spotify Developer Dashboard и создать новое приложение.
+Нужно перейти в [Spotify Developer Dashboard](https://developer.spotify.com/dashboard) и создать новое приложение.
 
 **Важно!** В URL обязательно указать "http://127.0.0.1:8888/callback", иначе будет ошибка "INVALID_CLIENT".
 
 3. Получить токен Яндекс.Музыки
 
-Способ получения токена периодически меняется, один из вариантов описан тут - [тут](https://github.com/MarshalX/yandex-music-api/discussions/513)
+Способ получения токена периодически меняется, один из вариантов описан [тут](https://github.com/MarshalX/yandex-music-api/discussions/513).
 
 4. Заполнить полученные значения
 
