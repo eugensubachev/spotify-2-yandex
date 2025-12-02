@@ -25,8 +25,8 @@
 ## Установка
 
 ```bash
-git clone https://github.com/USERNAME/REPO_NAME.git
-cd REPO_NAME
+git clone https://github.com/USERNAME/spotify-2-yandex.git
+cd spotify-2-yandex
 
 python3 -m venv venv
 source venv/bin/activate
