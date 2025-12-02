@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Virtualenv
+venv/
+
+# Local config / secrets / state
+.env
+.spotify_token_cache
+spotify_yandex_state.json
+sync.log
+
+# IDE / editors
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
