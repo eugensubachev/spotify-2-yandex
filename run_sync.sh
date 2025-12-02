@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-# Путь к проекту
-PROJECT_DIR="/root/spotify-yandex-sync"
+# Директория, где лежит сам скрипт
+SCRIPT_DIR="$(cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd)"
 
-cd "$PROJECT_DIR" || exit 1
+cd "$SCRIPT_DIR" || exit 1
 
 # Активируем venv
 source venv/bin/activate
 
-# Запускаем синк, всё логируем в файл
-python sync_spotify_to_yandex.py >> sync.log 2>&1
+# Лог пишем рядом с проектом
+python sync_spotify_to_yandex.py >> "$SCRIPT_DIR/sync.log" 2>&1
