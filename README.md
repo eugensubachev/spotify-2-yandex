@@ -25,7 +25,7 @@
 ## Установка
 
 ```bash
-git clone https://github.com/USERNAME/spotify-2-yandex.git
+git clone https://github.com/eugensubachev/spotify-2-yandex.git
 cd spotify-2-yandex
 
 python3 -m venv venv
