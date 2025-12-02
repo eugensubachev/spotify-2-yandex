@@ -7,9 +7,11 @@ from typing import Any, Dict, List, Optional, Set
 
 from dotenv import load_dotenv
 import spotipy
-from spotipy.oauth2 import SpotifyOAuth
+from spotipy.oauth2 import SpotifyOAuth, SpotifyOauthError
+from dotenv import load_dotenv
+
 from yandex_music import Client
-from yandex_music.exceptions import TimedOutError
+from yandex_music.exceptions import TimedOutError, UnauthorizedError
 
 # ===================== НАСТРОЙКИ / ENV =====================
 
@@ -36,22 +38,55 @@ STATE_DEFAULT = {
 
 
 def init_spotify_client() -> spotipy.Spotify:
-    """Инициализируем клиента Spotify (spotipy)."""
+    """Инициализируем клиента Spotify (spotipy) с понятными ошибками."""
     if not SPOTIFY_CLIENT_ID or not SPOTIFY_CLIENT_SECRET:
-        raise RuntimeError("SPOTIFY_CLIENT_ID или SPOTIFY_CLIENT_SECRET не заданы в .env")
+        print("❌ SPOTIFY_CLIENT_ID или SPOTIFY_CLIENT_SECRET не заданы.")
+        print("   Откройте .env и заполните значения Spotify API.")
+        raise RuntimeError("SPOTIFY_CLIENT_ID / SPOTIFY_CLIENT_SECRET отсутствуют")
 
     print("Инициализация Spotify клиента...")
     print("   Использую redirect_uri:", repr(SPOTIFY_REDIRECT_URI))
 
-    auth_manager = SpotifyOAuth(
-        client_id=SPOTIFY_CLIENT_ID,
-        client_secret=SPOTIFY_CLIENT_SECRET,
-        redirect_uri=SPOTIFY_REDIRECT_URI,
-        scope=SPOTIFY_SCOPE,
-        cache_path=".spotify_token_cache",
-        open_browser=True,  # на сервере можно сменить на False
-    )
-    return spotipy.Spotify(auth_manager=auth_manager)
+    try:
+        auth_manager = SpotifyOAuth(
+            client_id=SPOTIFY_CLIENT_ID,
+            client_secret=SPOTIFY_CLIENT_SECRET,
+            redirect_uri=SPOTIFY_REDIRECT_URI,
+            scope=SPOTIFY_SCOPE,
+            cache_path=".spotify_token_cache",
+            open_browser=True,  # на сервере можно переключить на False
+        )
+
+        # Можно сразу дернуть что-то простое, чтобы форсировать проверку токена/настроек
+        sp = spotipy.Spotify(auth_manager=auth_manager)
+        return sp
+
+    except SpotifyOauthError as e:
+        msg = str(e)
+
+        print("\n❌ Ошибка авторизации в Spotify.")
+        print("   Проверьте, правильно ли заполнен файл .env:")
+
+        print("   - SPOTIFY_CLIENT_ID")
+        print("   - SPOTIFY_CLIENT_SECRET")
+        print("   - SPOTIFY_REDIRECT_URI (должен совпадать с настройками в Spotify Dashboard)")
+
+        if "INVALID_CLIENT" in msg or "invalid_client" in msg:
+            print("\n   Детали: Spotify вернул INVALID_CLIENT —")
+            print("   это почти всегда означает неправильный Client ID / Secret.")
+        if "redirect_uri" in msg:
+            print("\n   Детали: проблема с redirect_uri.")
+            print("   Убедитесь, что в Spotify Dashboard добавлен ровно такой Redirect URI:")
+            print("   ", SPOTIFY_REDIRECT_URI)
+
+        print(f"\n   Техническое сообщение от Spotify: {msg}\n")
+        raise
+
+    except Exception as e:
+        print("\n❌ Не удалось инициализировать клиента Spotify.")
+        print(f"   Ошибка: {e}")
+        print("   Проверьте интернет и настройки .env.")
+        raise
 
 
 def init_yandex_client() -> Client:
