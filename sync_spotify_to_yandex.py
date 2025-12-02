@@ -42,7 +42,7 @@ def init_spotify_client() -> spotipy.Spotify:
     if not SPOTIFY_CLIENT_ID or not SPOTIFY_CLIENT_SECRET:
         print("❌ SPOTIFY_CLIENT_ID или SPOTIFY_CLIENT_SECRET не заданы.")
         print("   Откройте .env и заполните значения Spotify API.")
-        raise RuntimeError("SPOTIFY_CLIENT_ID / SPOTIFY_CLIENT_SECRET отсутствуют")
+        raise RuntimeError("Не заданы ключи Spotify (SPOTIFY_CLIENT_ID / SPOTIFY_CLIENT_SECRET) в .env")
 
     print("Инициализация Spotify клиента...")
     print("   Использую redirect_uri:", repr(SPOTIFY_REDIRECT_URI))
@@ -92,7 +92,8 @@ def init_spotify_client() -> spotipy.Spotify:
 def init_yandex_client() -> Client:
     """Инициализируем клиента Яндекс.Музыки."""
     if not YANDEX_MUSIC_TOKEN:
-        raise RuntimeError("YANDEX_MUSIC_TOKEN не задан в .env")
+        print("❌ YANDEX_MUSIC_TOKEN не задан. Проверьте файл .env")
+        raise RuntimeError("Не задан токен Яндекс.Музыки (YANDEX_MUSIC_TOKEN) в .env")
 
     print("Инициализация Yandex Music клиента...")
     client = Client(YANDEX_MUSIC_TOKEN).init()
@@ -417,6 +418,22 @@ def main() -> None:
     print(f"Пропущено (обработаны ранее): {skipped_already_processed}")
     print(f"Не найдено в Яндекс.Музыке: {not_found}")
 
-
+import sys
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+
+    # Наши ожидаемые ошибки конфигурации / авторизации
+    except (RuntimeError, SpotifyOauthError, UnauthorizedError) as e:
+        print("\n❌ Скрипт остановлен из-за ошибки конфигурации или авторизации.")
+        print(f"   Сообщение: {e}")
+        print("   ➜ Проверьте, правильно ли заполнен файл .env (ключи Spotify и токен Яндекс.Музыки).\n")
+        sys.exit(1)
+
+    # Любые другие непредвиденные ошибки
+    except Exception as e:
+        print("\n❌ Непредвиденная ошибка во время выполнения скрипта.")
+        print(f"   Тип: {type(e).__name__}")
+        print(f"   Сообщение: {e}")
+        print("   Если ошибка повторяется — создайте issue в репозитории.\n")
+        sys.exit(1)
