@@ -1,0 +1,3 @@
+spotipy
+yandex-music
+python-dotenv
